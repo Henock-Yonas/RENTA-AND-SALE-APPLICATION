@@ -1,8 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:folisho/login.dart';
 
-class SignupPage extends StatelessWidget {
+
+class SignupPage extends StatefulWidget {
+  const SignupPage({ Key? key }) : super(key: key);
+
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+ final GlobalKey<FormState> _formKey =GlobalKey<FormState>();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confpasswordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +68,40 @@ class SignupPage extends StatelessWidget {
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Username"),
-                  inputFile(label: "Email"),
-                  inputFile(label: "Password", obscureText: true),
-                  inputFile(label: "Confirm Password ", obscureText: true),
+                  inputFile(label: "Username",
+                  controller: _userNameController,
+                              validator: (String value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },),
+                  inputFile(label: "Email",
+                   controller: _emailController,
+                              validator: (String value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },
+                            ),
+                  inputFile(label: "Password", obscureText: true,
+                  controller: _passwordController,
+                              validator: (String value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },
+                              ),
+                  inputFile(label: "Confirm Password ", obscureText: true,
+                  controller: _confpasswordController,
+                              validator: (String value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },),
                 ],
               ),
               Container(
@@ -73,7 +120,11 @@ class SignupPage extends StatelessWidget {
                 child: MaterialButton(
                   minWidth: double.infinity,
                   height: 60,
-                  onPressed: () {},
+                  onPressed: ()  async {
+                      if (_formKey.currentState.validate()) {
+                          _register();
+                      }
+                    },
                   color: const Color(0xff5F6AC4),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -105,6 +156,36 @@ class SignupPage extends StatelessWidget {
       ),
     );
   }
+   @override
+  void dispose()  {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+   void _register()async{
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+    String confirmpassword = _confpasswordController.text.trim();
+    if(password == confirmpassword) {
+      try {
+        final User? user = (await _auth.createUserWithEmailAndPassword(
+            email: email, password: password)).user;
+        setState(() {
+          if (user != null) {
+            Fluttertoast.showToast(msg: "user created");
+            Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => const LoginPage()),);
+          }
+        });
+      } catch (e) {
+        Fluttertoast.showToast(msg: e.toString());
+      }
+    }
+    else{
+      Fluttertoast.showToast(msg: "Passwords don't match");
+    }
+   }
 }
 
 // we will be creating a widget for text field
@@ -136,3 +217,4 @@ Widget inputFile({label, obscureText = false}) {
     ],
   );
 }
+

@@ -1,10 +1,26 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:folisho/admin_main.dart';
+import 'package:folisho/forget_password.dart';
 import 'package:folisho/signup.dart';
 import 'package:folisho/theme.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+
+
   @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -55,9 +71,28 @@ class LoginPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
+                    
                     children: <Widget>[
-                      inputFile(label: "Email"),
-                      inputFile(label: "Password", obscureText: true)
+                      inputFile(
+                          controller: _emailController,
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          label: "Email"),
+                      inputFile(
+                        label: "Password",
+                        obscureText: true,
+                        controller: _passwordController,
+                        validator: (String value) {
+                          if (value.isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        },
+                      )
                     ],
                   ),
                 ),
@@ -67,20 +102,25 @@ class LoginPage extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 3, left: 3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(50),
-                      
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.8),
                           spreadRadius: 10,
                           blurRadius: 5,
-                          offset: Offset(0,7), // changes position of shadow
+                          offset: Offset(0, 7), // changes position of shadow
                         ),
                       ],
                     ),
                     child: MaterialButton(
                       minWidth: double.infinity,
                       height: 60,
-                      onPressed: () {},
+                      onPressed: () async {
+                        if (_formKey.currentState.validate()) {
+                          setState(() {
+                            _signInWithEmailAndPassword();
+                          });
+                        }
+                      },
                       color: const Color(0xff5F6AC4),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -99,12 +139,26 @@ class LoginPage extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ForgotPassword()));
+                  },
+                  child: const Text(
+                    "forget password",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => SignupPage()));
+                        MaterialPageRoute(builder: (_) => const SignupPage()));
                   },
                   child: const Text(
                     "Don't have an account? Sign Up",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.blue),
                   ),
                 ),
                 Container(
@@ -123,6 +177,26 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+
+  _signInWithEmailAndPassword() async {
+    try {
+      final User? user = (await _firebaseAuth.signInWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim()))
+          .user;
+      if (user != null) {
+        setState(() {
+          Fluttertoast.showToast(msg: "Signed In Sucessfully");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminMain()),
+          );
+        });
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
 }
 
 // we will be creating a widget for text field
@@ -132,10 +206,10 @@ Widget inputFile({label, obscureText = false}) {
     children: <Widget>[
       Text(
         label,
-        style: TextStyle(
+        style: const TextStyle(
             fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
       ),
-      SizedBox(
+      const SizedBox(
         height: 5,
       ),
       TextField(
@@ -148,7 +222,7 @@ Widget inputFile({label, obscureText = false}) {
             border:
                 OutlineInputBorder(borderSide: BorderSide(color: Colors.grey))),
       ),
-      SizedBox(
+      const SizedBox(
         height: 10,
       )
     ],

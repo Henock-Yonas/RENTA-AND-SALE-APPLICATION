@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "500818569453",
+    "project_id": "folisho1",
+    "storage_bucket": "folisho1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500818569453:android:5c8c186b74682277ce84e4",
+        "android_client_info": {
+          "package_name": "com.example.folisho"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500818569453-9qrqrpb55phok0rqnpddhj45h9n3dd8e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPaHOpSXYL8j-Q4xMXn1nviUdVkgHaJow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500818569453-9qrqrpb55phok0rqnpddhj45h9n3dd8e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500818569453:android:0b5977dfcaf218efce84e4",
+        "android_client_info": {
+          "package_name": "com.example.folisho1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500818569453-9qrqrpb55phok0rqnpddhj45h9n3dd8e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPaHOpSXYL8j-Q4xMXn1nviUdVkgHaJow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500818569453-9qrqrpb55phok0rqnpddhj45h9n3dd8e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
