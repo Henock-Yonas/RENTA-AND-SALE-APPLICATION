@@ -8,8 +8,6 @@ import 'package:folisho/signup.dart';
 import 'package:folisho/theme.dart';
 
 class LoginPage extends StatefulWidget {
-
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -20,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -71,27 +69,11 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
-                    
                     children: <Widget>[
-                      inputFile(
-                          controller: _emailController,
-                          validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please enter some text';
-                            }
-                            return null;
-                          },
-                          label: "Email"),
+                      inputFile(label: "Email"),
                       inputFile(
                         label: "Password",
                         obscureText: true,
-                        controller: _passwordController,
-                        validator: (String value) {
-                          if (value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
                       )
                     ],
                   ),
@@ -115,11 +97,11 @@ class _LoginPageState extends State<LoginPage> {
                       minWidth: double.infinity,
                       height: 60,
                       onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          setState(() {
-                            _signInWithEmailAndPassword();
-                          });
-                        }
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminMain()),
+                        );
                       },
                       color: const Color(0xff5F6AC4),
                       elevation: 0,
@@ -178,25 +160,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _signInWithEmailAndPassword() async {
-    try {
-      final User? user = (await _firebaseAuth.signInWithEmailAndPassword(
-              email: _emailController.text.trim(),
-              password: _passwordController.text.trim()))
-          .user;
-      if (user != null) {
-        setState(() {
-          Fluttertoast.showToast(msg: "Signed In Sucessfully");
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminMain()),
-          );
-        });
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    }
-  }
+ 
 }
 
 // we will be creating a widget for text field

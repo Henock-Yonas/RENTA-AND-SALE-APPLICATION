@@ -68,40 +68,10 @@ class _SignupPageState extends State<SignupPage> {
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Username",
-                  controller: _userNameController,
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter some text';
-                                }
-                                return null;
-                              },),
-                  inputFile(label: "Email",
-                   controller: _emailController,
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter some text';
-                                }
-                                return null;
-                              },
-                            ),
-                  inputFile(label: "Password", obscureText: true,
-                  controller: _passwordController,
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter some text';
-                                }
-                                return null;
-                              },
-                              ),
-                  inputFile(label: "Confirm Password ", obscureText: true,
-                  controller: _confpasswordController,
-                              validator: (String value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter some text';
-                                }
-                                return null;
-                              },),
+                  inputFile(label: "Username"),
+                  inputFile(label: "Email" ),
+                  inputFile(label: "Password", obscureText: true),
+                  inputFile(label: "Confirm Password ", obscureText: true),
                 ],
               ),
               Container(
@@ -121,9 +91,8 @@ class _SignupPageState extends State<SignupPage> {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: ()  async {
-                      if (_formKey.currentState.validate()) {
-                          _register();
-                      }
+                      Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()),);
                     },
                   color: const Color(0xff5F6AC4),
                   elevation: 0,
@@ -156,36 +125,6 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
-   @override
-  void dispose()  {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-   void _register()async{
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-    String confirmpassword = _confpasswordController.text.trim();
-    if(password == confirmpassword) {
-      try {
-        final User? user = (await _auth.createUserWithEmailAndPassword(
-            email: email, password: password)).user;
-        setState(() {
-          if (user != null) {
-            Fluttertoast.showToast(msg: "user created");
-            Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const LoginPage()),);
-          }
-        });
-      } catch (e) {
-        Fluttertoast.showToast(msg: e.toString());
-      }
-    }
-    else{
-      Fluttertoast.showToast(msg: "Passwords don't match");
-    }
-   }
 }
 
 // we will be creating a widget for text field
