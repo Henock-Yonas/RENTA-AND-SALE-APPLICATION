@@ -1,6 +1,6 @@
 # folisho
 
-A new Flutter project.
+A new Flutter project. backend firestore
 
 ## Getting Started
 
