@@ -1,251 +1,179 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:folisho/horizontal_data_table.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:folisho/main.dart';
+import 'package:folisho/rent_detail.dart';
+import 'package:folisho/sale_detail.dart';
 import 'package:folisho/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'SearchRentDetail.dart';
 
 class TotalRent extends StatelessWidget {
-  const TotalRent({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'አጠቃላይ'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  HDTRefreshController _hdtRefreshController = HDTRefreshController();
-
-  static const int sortName = 0;
-  static const int sortStatus = 1;
-  bool isAscending = true;
-  int sortType = sortName;
-
-  @override
-  void initState() {
-    user.initData(100);
-    super.initState();
-  }
+  TotalRent({Key? key}) : super(key: key);
+  static const String _title = 'አጠቃላይ';
+  Stream<QuerySnapshot> users =
+      FirebaseFirestore.instance.collection('Registration').snapshots();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-        backgroundColor: purpleColor,
-      ),
-      body: _getBodyWidget(),
-    );
-  }
+          title: const Text(_title),
+          centerTitle: true,
+          backgroundColor: Colors.deepPurple),
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: StreamBuilder<QuerySnapshot>(
+                stream: users,
+                builder: (
+                  BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot,
+                ) {
+                  if (snapshot.hasError) {
+                    return Text('something is wrong');
+                  }
 
-  Widget _getBodyWidget() {
-    return Container(
-      child: HorizontalDataTable(
-        leftHandSideColumnWidth: 100,
-        rightHandSideColumnWidth: 600,
-        isFixedHeader: true,
-        headerWidgets: _getTitleWidget(),
-        leftSideItemBuilder: _generateFirstColumnRow,
-        rightSideItemBuilder: _generateRightHandSideColumnRow,
-        itemCount: user.userInfo.length,
-        rowSeparatorWidget: const Divider(
-          color: Colors.black54,
-          height: 1.0,
-          thickness: 0.0,
-        ),
-        leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
-        rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
-        verticalScrollbarStyle: const ScrollbarStyle(
-          thumbColor: Colors.yellow,
-          isAlwaysShown: true,
-          thickness: 4.0,
-          radius: Radius.circular(5.0),
-        ),
-        horizontalScrollbarStyle: const ScrollbarStyle(
-          thumbColor: Colors.red,
-          isAlwaysShown: true,
-          thickness: 4.0,
-          radius: Radius.circular(5.0),
-        ),
-        enablePullToRefresh: true,
-        refreshIndicator: const WaterDropHeader(),
-        refreshIndicatorHeight: 60,
-        onRefresh: () async {
-          //Do sth
-          await Future.delayed(const Duration(milliseconds: 500));
-          _hdtRefreshController.refreshCompleted();
-        },
-        htdRefreshController: _hdtRefreshController,
-      ),
-      height: MediaQuery.of(context).size.height,
-    );
-  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Text('loading');
+                  }
 
-  List<Widget> _getTitleWidget() {
-    return [
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-        ),
-        child: _getTitleItemWidget(
-            'ተራ ቁጥር' + (sortType == sortName ? (isAscending ? '↓' : '↑') : ''),
-            100),
-        onPressed: () {
-          sortType = sortName;
-          isAscending = !isAscending;
-          user.sortName(isAscending);
-          setState(() {});
-        },
-      ),
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-        ),
-        child: _getTitleItemWidget(
-            'ሁኔታ' +
-                (sortType == sortStatus ? (isAscending ? '↓' : '↑') : ''),
-            100),
-        onPressed: () {
-          sortType = sortStatus;
-          isAscending = !isAscending;
-          user.sortStatus(isAscending);
-          setState(() {});
-        },
-      ),
-      _getTitleItemWidget('የደላላው ስም', 200),
-      _getTitleItemWidget('የተመዘገበበት ቀን', 100),
-      _getTitleItemWidget('ስልክ ቁጥር', 200),
-    ];
-  }
+                  final data = snapshot.requireData;
 
-  Widget _getTitleItemWidget(String label, double width) {
-    return Container(
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-      width: width,
-      height: 56,
-      padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.centerLeft,
-    );
-  }
-
-  Widget _generateFirstColumnRow(BuildContext context, int index) {
-    return Container(
-      child: Text(user.userInfo[index].name),
-      width: 100,
-      height: 52,
-      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-      alignment: Alignment.centerLeft,
-    );
-  }
-
-  Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
-    return Row(
-      children: <Widget>[
-        Container(
-          child: Row(
-            children: <Widget>[
-              Icon(
-                  user.userInfo[index].status
-                      ? Icons.archive_outlined
-                      : Icons.archive,
-                  color:
-                      user.userInfo[index].status ? Colors.red : Colors.green),
-              Text(user.userInfo[index].status ? 'ያልተረጋገጠ' : 'የተረጋገጠ')
-            ],
+                  int x = 1;
+                  return DataTable(
+                    columns: const <DataColumn>[
+                      DataColumn(
+                        label: Text(
+                          'ተ.ቁ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'ስም',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'ስልክ ቁጥር ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'የተመዘገበበት ቀን ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'የተመዘገበበት ሰዐት ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'መለያ ቁጥር ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'ሁኔታ',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                    rows: List<DataRow>.generate(
+                      data.size,
+                      (index) => DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text(index.toString())),
+                          DataCell(
+                            Text("${data.docs[index]['name']}"),
+                          ),
+                          DataCell(
+                            Text("${data.docs[index]['phoneNumber']}"),
+                            onTap: () {
+                              customLaunch(
+                                  'tel:${data.docs[index]['phoneNumber']}');
+                            },
+                          ),
+                          DataCell(Text("${data.docs[index]['date']}")),
+                          DataCell(Text("${data.docs[index]['time']}")),
+                          DataCell(
+                            Text("${data.docs[index]['index']}"),
+                            onTap: () {
+                              FirebaseFirestore _firestore =
+                                  FirebaseFirestore.instance;
+                              _firestore
+                                  .collection('rent')
+                                  .where('id',
+                                      isEqualTo: "${data.docs[index]['index']}")
+                                  .get()
+                                  .then((value) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            SearchRentDetail(value)));
+                              });
+                            },
+                          ),
+                          DataCell(
+                            IconButton(
+                                onPressed: () {
+                                  delete("${data.docs[index]['uid']}");
+                                },
+                                icon: Icon(Icons.delete)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
           ),
-          width: 100,
-          height: 52,
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          alignment: Alignment.centerLeft,
         ),
-        Container(
-          child: Text(user.userInfo[index].phone),
-          width: 200,
-          height: 52,
-          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-          alignment: Alignment.centerLeft,
-        ),
-        Container(
-          child: Text(user.userInfo[index].registerDate),
-          width: 100,
-          height: 52,
-          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.centerLeft,
-        ),
-        Container(
-          child: Text(user.userInfo[index].terminationDate),
-          width: 200,
-          height: 52,
-          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.centerLeft,
-        ),
-      ],
+      ),
     );
   }
-}
 
-User user = User();
-
-class User {
-  List<UserInfo> userInfo = [];
-
-  void initData(int size) {
-    for (int i = 0; i < size; i++) {
-      userInfo.add(UserInfo(
-          "ተ.ቁ $i", i % 3 == 0, 'ታሪኩ ተስፋዬ', '2019-01-01', '+251964687941'));
+  void customLaunch(command) async {
+    if (await canLaunch(command)) {
+      await launch(command);
+    } else {
+      print(' could not launch $command');
     }
   }
 
-  ///
-  /// Single sort, sort Name's id
-  void sortName(bool isAscending) {
-    userInfo.sort((a, b) {
-      int aId = int.tryParse(a.name.replaceFirst('ተ.ቁ ', '')) ?? 0;
-      int bId = int.tryParse(b.name.replaceFirst('ተ.ቁ ', '')) ?? 0;
-      return (aId - bId) * (isAscending ? 1 : -1);
-    });
+  delete(String uid) async {
+    // calling our firestore
+    // calling our user model
+    // sedning these values
+
+    await FirebaseFirestore.instance
+        .collection("Registration")
+        .doc(uid)
+        .delete();
+    Fluttertoast.showToast(msg: 'deleted succesfully');
   }
-
-  ///
-  /// sort with Status and Name as the 2nd Sort
-  void sortStatus(bool isAscending) {
-    userInfo.sort((a, b) {
-      if (a.status == b.status) {
-        int aId = int.tryParse(a.name.replaceFirst('ተ.ቁ ', '')) ?? 0;
-        int bId = int.tryParse(b.name.replaceFirst('ተ.ቁ ', '')) ?? 0;
-        return (aId - bId);
-      } else if (a.status) {
-        return isAscending ? 1 : -1;
-      } else {
-        return isAscending ? -1 : 1;
-      }
-    });
-  }
-}
-
-class UserInfo {
-  String name;
-  bool status;
-  String phone;
-  String registerDate;
-  String terminationDate;
-
-  UserInfo(this.name, this.status, this.phone, this.registerDate,
-      this.terminationDate);
 }

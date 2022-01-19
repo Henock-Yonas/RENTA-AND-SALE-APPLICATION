@@ -2,17 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:folisho/Registration.dart';
 import 'package:folisho/login.dart';
-import 'package:folisho/loginSale.dart';
 import 'package:folisho/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SaleDetailPage extends StatelessWidget {
-  int index;
+class SearchRentDetail extends StatefulWidget {
+  QuerySnapshot<Map<String, dynamic>> usermap;
+  
 
-  SaleDetailPage(this.index, {Key? key}) : super(key: key);
+  SearchRentDetail(this.usermap, {Key? key}) : super(key: key);
   Stream<QuerySnapshot> users =
-      FirebaseFirestore.instance.collection('sale').snapshots();
+      FirebaseFirestore.instance.collection('rent').snapshots();
+  @override
+  _RentAddLSState createState() => _RentAddLSState();
+}
 
+class _RentAddLSState extends State<SearchRentDetail> {
   void customLaunch(command) async {
     if (await canLaunch(command)) {
       await launch(command);
@@ -24,7 +28,7 @@ class SaleDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-        stream: users,
+        stream: FirebaseFirestore.instance.collection('rent').snapshots(),
         builder: (
           BuildContext context,
           AsyncSnapshot<QuerySnapshot> snapshot,
@@ -37,7 +41,7 @@ class SaleDetailPage extends StatelessWidget {
             return Text('loading');
           }
 
-          final data = snapshot.requireData;
+          final data = widget.usermap;
           return Scaffold(
             backgroundColor: whiteColor,
             body: SafeArea(
@@ -47,7 +51,7 @@ class SaleDetailPage extends StatelessWidget {
                 width: 410,
                 height: 400,
                 child: Image.network(
-                  "${data.docs[index]['image']}",
+                  "${data.docs[data.size - 1]['image']}",
                   height: 296,
                   width: MediaQuery.of(context).size.width,
                   fit: BoxFit.fill,
@@ -81,14 +85,14 @@ class SaleDetailPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${data.docs[index]['kindofhome']}",
+                                    "${data.docs[data.size - 1]['kindofhome']}",
                                     style: secondaryTitle,
                                   ),
                                   SizedBox(
                                     height: 4,
                                   ),
                                   Text(
-                                    "${data.docs[index]['address']}",
+                                    "${data.docs[data.size - 1]['address']}",
                                     style: infoSecondaryTitle,
                                   ),
                                 ],
@@ -97,7 +101,7 @@ class SaleDetailPage extends StatelessWidget {
                               Row(
                                 children: [1].map((e) {
                                   return Text(
-                                    ("መለያ ቁጥር፦ " + '${data.docs[index]['id']}'),
+                                    "መለያ ቁጥር፦ " +  ("${data.docs[data.size - 1]['id']}"),
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   );
@@ -130,7 +134,7 @@ class SaleDetailPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${data.docs[index]['name']}",
+                                    "${data.docs[data.size - 1]['name']}",
                                     style: contentTitle,
                                   ),
                                   Text(
@@ -145,7 +149,7 @@ class SaleDetailPage extends StatelessWidget {
                                   InkWell(
                                     onTap: () {
                                       customLaunch(
-                                          'sms:${data.docs[index]['phoneNumber']}');
+                                          'sms:${data.docs[data.size - 1]['phoneNumber']}');
                                     },
                                     child: Image.asset(
                                       "assets/images/message_icon.png",
@@ -156,11 +160,11 @@ class SaleDetailPage extends StatelessWidget {
                                   InkWell(
                                     onTap: () {
                                       customLaunch(
-                                          'tel:${data.docs[index]['phoneNumber']}');
+                                          'tel:${data.docs[data.size - 1]['phoneNumber']}');
                                     },
                                     child: Image.asset(
                                       "assets/images/call_icon.png",
-                                      width: 30,
+                                      width: 31,
                                     ),
                                   ),
                                 ],
@@ -173,7 +177,7 @@ class SaleDetailPage extends StatelessWidget {
                         ),
                         // NOTE: facilities
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          padding: EdgeInsets.symmetric(horizontal: 31),
                           child: Text(
                             "የቤቱ ገጽታዎች",
                             style: sectionSecondaryTitle,
@@ -193,7 +197,7 @@ class SaleDetailPage extends StatelessWidget {
                                   child: Column(
                                     children: [
                                       Image.network(
-                                        "${data.docs[index]['detailImage']}",
+                                        "${data.docs[0]['detailImage']}",
                                         fit: BoxFit.fill,
                                         height: 150,
                                         width: 150,
@@ -210,7 +214,7 @@ class SaleDetailPage extends StatelessWidget {
                                   child: Column(
                                     children: [
                                       Image.network(
-                                        "${data.docs[index]['detailImage2']}",
+                                        "${data.docs[data.size - 1]['detailImage2']}",
                                         fit: BoxFit.fill,
                                         height: 150,
                                         width: 150,
@@ -227,7 +231,7 @@ class SaleDetailPage extends StatelessWidget {
                                   child: Column(
                                     children: [
                                       Image.network(
-                                        "${data.docs[index]['detailImage3']}",
+                                        "${data.docs[data.size - 1]['detailImage3']}",
                                         fit: BoxFit.fill,
                                         height: 150,
                                         width: 150,
@@ -257,7 +261,7 @@ class SaleDetailPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
-                      "${data.docs[index]['explanation']}",
+                      "${data.docs[data.size - 1]['explanation']}",
                       style: descText,
                     ),
                   ),
@@ -297,11 +301,11 @@ class SaleDetailPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "የሽያጭ ዋጋ",
+                        "ኪራይ በወር",
                         style: priceTitle,
                       ),
                       Text(
-                        "${data.docs[index]['price']}",
+                        "${data.docs[data.size - 1]['price']}",
                         style: priceText,
                       ),
                     ],
@@ -310,7 +314,7 @@ class SaleDetailPage extends StatelessWidget {
                   MaterialButton(
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => LoginSalePage()));
+                          MaterialPageRoute(builder: (_) => LoginPage()));
                     },
                     color: purpleColor,
                     minWidth: 196,
@@ -320,7 +324,7 @@ class SaleDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(28),
                     ),
                     child: Text(
-                      "አሁን ይግዙ",
+                      "አሁን ይከራዩ",
                       style: TextStyle(
                         color: whiteColor,
                         fontSize: 16,

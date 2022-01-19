@@ -1,265 +1,337 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:folisho/Registration.dart';
 import 'package:folisho/login.dart';
 import 'package:folisho/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatelessWidget {
-  const DetailPage({Key? key}) : super(key: key);
+  int index;
+
+  DetailPage(this.index, {Key? key}) : super(key: key);
+  Stream<QuerySnapshot> users =
+      FirebaseFirestore.instance.collection('rent').snapshots();
+
+  void customLaunch(command) async {
+    if (await canLaunch(command)) {
+      await launch(command);
+    } else {
+      print(' could not launch $command');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: whiteColor,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // NOTE: thumbnail image
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 296,
-              child: Image.asset(
-                "assets/images/banner1.png",
-                height: 296,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.cover,
-              ),
-            ),
-            // NOTE: content
-            ListView(
-              children: [
-                SizedBox(
-                  height: 266,
-                ),
-                Container(
+    return StreamBuilder<QuerySnapshot>(
+        stream: users,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<QuerySnapshot> snapshot,
+        ) {
+          if (snapshot.hasError) {
+            return Text('something is wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text('loading');
+          }
+
+          final data = snapshot.requireData;
+          return Scaffold(
+            backgroundColor: whiteColor,
+            body: SafeArea(
+                child: Stack(children: [
+              // NOTE: thumbnail image
+              Container(
+                width: 410,
+                height: 400,
+                child: Image.network(
+                  "${data.docs[index]['image']}",
+                  height: 296,
                   width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(30)),
-                    color: whiteColor,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              // NOTE: content
+              ListView(
+                children: [
+                  SizedBox(
+                    height: 266,
                   ),
-                  child: Column(
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(30)),
+                      color: whiteColor,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // NOTE: title
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 24,
+                          ),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${data.docs[index]['kindofhome']}",
+                                    style: secondaryTitle,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Text(
+                                    "${data.docs[index]['address']}",
+                                    style: infoSecondaryTitle,
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Row(
+                                children: [1].map((e) {
+                                  return Text(
+                                    "መለያ ቁጥር፦ " + ('${data.docs[index]['id']}'),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  );
+                                }).toList(),
+                              )
+                            ],
+                          ),
+                        ),
+                        // NOTE: agent
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Text(
+                            "ይህንን መረጃ ለጣፊ",
+                            style: sectionSecondaryTitle,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/delala.png",
+                                width: 50,
+                              ),
+                              SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${data.docs[index]['name']}",
+                                    style: contentTitle,
+                                  ),
+                                  Text(
+                                    "ደላላ",
+                                    style: infoText,
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      customLaunch(
+                                          'sms:${data.docs[index]['phoneNumber']}');
+                                    },
+                                    child: Image.asset(
+                                      "assets/images/message_icon.png",
+                                      width: 30,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  InkWell(
+                                    onTap: () {
+                                      customLaunch(
+                                          'tel:${data.docs[index]['phoneNumber']}');
+                                    },
+                                    child: Image.asset(
+                                      "assets/images/call_icon.png",
+                                      width: 30,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 24,
+                        ),
+                        // NOTE: facilities
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Text(
+                            "የቤቱ ገጽታዎች",
+                            style: sectionSecondaryTitle,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          height: 250,
+                          padding: EdgeInsets.only(bottom: 5),
+                          child: ListView(
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              SizedBox(width: 30),
+                              Card(
+                                child: Container(
+                                  child: Column(
+                                    children: [
+                                      Image.network(
+                                        "${data.docs[index]['detailImage']}",
+                                        fit: BoxFit.fill,
+                                        height: 150,
+                                        width: 150,
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text("ፎቶ፦ 1")
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              Card(
+                                child: Container(
+                                  child: Column(
+                                    children: [
+                                      Image.network(
+                                        "${data.docs[index]['detailImage2']}",
+                                        fit: BoxFit.fill,
+                                        height: 150,
+                                        width: 150,
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text("ፎቶ፦ 2")
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              Card(
+                                child: Container(
+                                  child: Column(
+                                    children: [
+                                      Image.network(
+                                        "${data.docs[index]['detailImage3']}",
+                                        fit: BoxFit.fill,
+                                        height: 150,
+                                        width: 150,
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text("ፎቶ፦ 3")
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // NOTE: description
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      "ማብራሪያ",
+                      style: sectionSecondaryTitle,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      "${data.docs[index]['explanation']}",
+                      style: descText,
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                ],
+              ),
+              // NOTE: button back
+              Positioned(
+                top: 20,
+                left: 20,
+                child: MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  minWidth: 30,
+                  height: 30,
+                  padding: EdgeInsets.all(5),
+                  color: whiteColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_outlined,
+                    size: 14,
+                  ),
+                ),
+              ),
+            ])),
+            bottomNavigationBar: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              height: 80,
+              color: whiteColor,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // NOTE: title
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 24,
-                        ),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "ዘመናዊ ፎቅ",
-                                  style: secondaryTitle,
-                                ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  "ታቦር ክ/ማ፣ 7ኛ ካምፕ ሰፈር",
-                                  style: infoSecondaryTitle,
-                                ),
-                              ],
-                            ),
-                            Spacer(),
-                            Row(
-                              children: [1, 2, 3, 4, 5].map((e) {
-                                return Icon(
-                                  Icons.star,
-                                  size: 12,
-                                  color: (e <= 5) ? orangeColor : greyColor,
-                                );
-                              }).toList(),
-                            )
-                          ],
-                        ),
+                      Text(
+                        "ኪራይ በወር",
+                        style: priceTitle,
                       ),
-                      // NOTE: agent
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Text(
-                          "ይህንን መረጃ ለጣፊ",
-                          style: sectionSecondaryTitle,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/images/owner1.png",
-                              width: 50,
-                            ),
-                            SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "ደበበ ታዬ",
-                                  style: contentTitle,
-                                ),
-                                Text(
-                                  "ደላላ",
-                                  style: infoText,
-                                ),
-                              ],
-                            ),
-                            Spacer(),
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    "assets/images/message_icon.png",
-                                    width: 30,
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    "assets/images/call_icon.png",
-                                    width: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      // NOTE: facilities
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Text(
-                          "የቤቱ ገጽታዎች",
-                          style: sectionSecondaryTitle,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        height: 115,
-                        padding: EdgeInsets.only(bottom: 5),
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            SizedBox(width: 30),
-                            FacilityCard(
-                              imageUrl: "assets/images/facilities1.png",
-                              title: "የመዋኛ ገንዳ",
-                            ),
-                            SizedBox(width: 20),
-                            FacilityCard(
-                              imageUrl: "assets/images/facilities2.png",
-                              title: "ባለ 4 መኝታ",
-                            ),
-                            SizedBox(width: 20),
-                            FacilityCard(
-                              imageUrl: "assets/images/facilities3.png",
-                              title: "ጋራጅ",
-                            ),
-                          ],
-                        ),
+                      Text(
+                        "${data.docs[index]['price']}",
+                        style: priceText,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                // NOTE: description
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Text(
-                    "ማብራሪያ",
-                    style: sectionSecondaryTitle,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Text(
-                    "ይህ ዘመናዊ ቪላ ጂ+3 ሲሆን በ 400 ካ.ሜ ላይ ያረፈ ሲሆን ቤቱ በአጠቃላይ 18 ክፍሎች አሉት።\n\n አድራሻ፦ ታቦር ክ/ማ፣ ሂጣታ ቀበሌ፣ 7ኛ ካምፕ፣ ከሻፌታ ሕንጻ በስተጅርባ",
-                    style: descText,
-                  ),
-                ),
-                const SizedBox(height:80),
-              ],
-            ),
-            // NOTE: button back
-            Positioned(
-              top: 20,
-              left: 20,
-              child: MaterialButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                minWidth: 30,
-                height: 30,
-                padding: EdgeInsets.all(5),
-                color: whiteColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_outlined,
-                  size: 14,
-                ),
+                  Spacer(),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => LoginPage()));
+                    },
+                    color: purpleColor,
+                    minWidth: 196,
+                    height: 50,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    child: Text(
+                      "አሁን ይከራዩ",
+                      style: TextStyle(
+                        color: whiteColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-        height: 80,
-        color: whiteColor,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "ኪራይ በወር",
-                  style: priceTitle,
-                ),
-                Text(
-                  "40,000",
-                  style: priceText,
-                ),
-              ],
-            ),
-            Spacer(),
-            MaterialButton(
-              onPressed: () {
-                 Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPage()));
-              },
-              color: purpleColor,
-              minWidth: 196,
-              height: 50,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Text(
-                "አሁን ይከራዩ",
-                style: TextStyle(
-                  color: whiteColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -288,7 +360,7 @@ class FacilityCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(imageUrl),
+              Image.network(imageUrl),
               SizedBox(height: 9),
               Center(
                 child: Text(

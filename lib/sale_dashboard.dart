@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:folisho/rent_add_dashboard.dart';
-import 'package:folisho/rent_delete_dashboard.dart';
+import 'package:folisho/model/rent_model.dart';
+import 'package:folisho/model/sale_model.dart';
+import 'package:folisho/rent_addLS.dart';
 import 'package:folisho/rent_detail.dart';
-import 'package:folisho/rent_edit_dashboard.dart';
 import 'package:folisho/rent_read_dashboard.dart';
 import 'package:folisho/sale_add.dart';
-import 'package:folisho/sale_delete.dart';
-import 'package:folisho/sale_edit.dart';
 import 'package:folisho/sale_read.dart';
 import 'package:folisho/theme.dart';
 
@@ -18,7 +16,7 @@ class SaleDashboard extends StatelessWidget {
     return Scaffold(
         backgroundColor: whiteColor,
         body: Container(
-          padding: const EdgeInsets.only(top: 150),
+          padding: const EdgeInsets.only(top: 250),
           child: GridView(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2),
@@ -26,10 +24,8 @@ class SaleDashboard extends StatelessWidget {
               Card(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (content) => const SaleRead()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (content) => SaleRead()));
                   },
                   child: Image.asset(
                     "assets/read_data.png",
@@ -43,38 +39,11 @@ class SaleDashboard extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (content) => const SaleAdd()));
+                            builder: (content) =>
+                                sale_add(saleModel: SaleModel())));
                   },
                   child: Image.asset(
                     "assets/add_data.jpg",
-                    scale: 2,
-                  ),
-                ),
-              ),
-              Card(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (content) => const SaleEdit()));
-                  },
-                  child: Image.asset(
-                    "assets/edit_data.png",
-                    scale: 7,
-                  ),
-                ),
-              ),
-              Card(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (content) => const SaleDelete()));
-                  },
-                  child: Image.asset(
-                    "assets/delete_data.jpg",
                     scale: 2,
                   ),
                 ),
@@ -84,5 +53,3 @@ class SaleDashboard extends StatelessWidget {
         ));
   }
 }
-// Slider card
-

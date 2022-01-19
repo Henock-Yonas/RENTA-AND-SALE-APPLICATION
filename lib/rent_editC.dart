@@ -2,8 +2,10 @@
 // ignore: file_names
 // ignore_for_file: unused_import
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:folisho/login.dart';
 import 'package:folisho/theme.dart';
 
@@ -194,6 +196,15 @@ class RentEditC extends StatelessWidget {
       ),
     );
   }
+delete(String uid) async {
+  // calling our firestore
+  // calling our user model
+  // sedning these values
+
+  await FirebaseFirestore.instance.collection("rent").doc(uid).delete();
+  Fluttertoast.showToast(msg: uid);
+}
+
 }
 // Facilities Card
         

@@ -116,7 +116,7 @@ class AdminMain extends StatelessWidget {
                     ],
                   )),
               Container(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 40),
                 child: GridView(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
@@ -142,123 +142,11 @@ class AdminMain extends StatelessWidget {
                         children: [
                           Container(
                             child: GestureDetector(
-                              onTap: () { 
-                                Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                const TotalRent()));
-                              },
-                              child: Image.asset(
-                                "assets/all.png",
-                                scale: 4,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "ጠቅላላ፦79",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                    ),
-                    Card(
-                      child: Column(
-                        children: [
-                          Container(
-                            child: GestureDetector(
-                              onTap: () { Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                const TotalSale()));
-                              },
-                              child: Image.asset(
-                                "assets/all.png",
-                                scale: 4,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "ጠቅላላ፦79",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                    ),
-                    Card(
-                      child: Column(
-                        children: [
-                          Container(
-                            child: GestureDetector(
-                              onTap: () { 
-                                Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                const LoadingRent()));
-                              },
-                              child: Image.asset(
-                                "assets/loading.png",
-                                scale: 3,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          const Text(
-                            "ጠቅላላ፦79",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 20, 30, 10),
-                    ),
-                    Card(
-                      child: Column(
-                        children: [
-                          Container(
-                            child: GestureDetector(
-                              onTap: () {
-                               Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                const LoadingSale()));
-                              },
-                              child: Image.asset(
-                                "assets/loading.png",
-                                scale: 3,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          const Text(
-                            "ጠቅላላ፦79",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 20, 30, 10),
-                    ),
-                    Card(
-                      child: Column(
-                        children: [
-                          Container(
-                            child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                CompleteRent()));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (content) => TotalRent()));
                               },
                               child: Image.asset(
                                 "assets/complete.png",
@@ -268,13 +156,13 @@ class AdminMain extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           const Text(
-                            "ጠቅላላ፦79",
+                            "የኪራይ ተመዝጋቢዎች",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                       elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 20, 30, 10),
+                      margin: const EdgeInsets.fromLTRB(30, 30, 30, 0),
                     ),
                     Card(
                       child: Column(
@@ -283,10 +171,9 @@ class AdminMain extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (content) =>
-                                                const CompleteSale()));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (content) => TotalSale()));
                               },
                               child: Image.asset(
                                 "assets/complete.png",
@@ -296,13 +183,13 @@ class AdminMain extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           const Text(
-                            "ጠቅላላ፦79",
+                            "የግዢ ተመዝጋቢዎች",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                       elevation: 8,
-                      margin: const EdgeInsets.fromLTRB(30, 20, 30, 10),
+                      margin: const EdgeInsets.fromLTRB(30, 30, 30, 0),
                     ),
                   ],
                 ),

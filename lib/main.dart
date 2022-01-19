@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:folisho/rent.dart';
 import 'package:folisho/sale.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -32,10 +32,8 @@ class MyApp extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (content) => const Rent()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (content) => Rent()));
                       },
                       child: Image.asset(
                         'assets/house-for-rent.png',
@@ -47,10 +45,9 @@ class MyApp extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (content) => const Sale()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (content) => Sale()));
+                            
                       },
                       child: Image.asset(
                         'assets/houseforsale.png',
@@ -103,6 +100,30 @@ class MyApp extends StatelessWidget {
                 "ከላይ የተገለጸውን አገልግሎት ለመጠቀም እንደምርጫዎ ከገጹ መጀመሪያ ያለውን ምስል ይጫኑ",
                 style: TextStyle(
                   fontSize: 14,
+                  color: Color(0xff5F6AC4),
+                  decoration: TextDecoration.none,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              const Text(
+                "Developed by Henock Yonas and Fasika Abera",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xff5F6AC4),
+                  decoration: TextDecoration.none,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              const Text(
+                "2022 @copyright",
+                style: TextStyle(
+                  fontSize: 12,
                   color: Color(0xff5F6AC4),
                   decoration: TextDecoration.none,
                 ),

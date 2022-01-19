@@ -1,8 +1,15 @@
+// ignore: file_names
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:folisho/login.dart';
+import 'package:folisho/model/rent_model.dart';
 import 'package:folisho/theme.dart';
 
 class RentReadL extends StatelessWidget {
+
+  
+
   const RentReadL({Key? key}) : super(key: key);
 
   @override
@@ -188,7 +195,7 @@ class RentReadL extends StatelessWidget {
                     style: descText,
                   ),
                 ),
-                const SizedBox(height:80),
+                const SizedBox(height: 80),
               ],
             ),
             // NOTE: button back
@@ -238,7 +245,8 @@ class RentReadL extends StatelessWidget {
             Spacer(),
             MaterialButton(
               onPressed: () {
-                 Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPage()));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => LoginPage()));
               },
               color: purpleColor,
               minWidth: 196,

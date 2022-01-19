@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:folisho/Registration.dart';
+import 'package:folisho/RegistrationSale.dart';
 import 'package:folisho/admin_main.dart';
 import 'package:folisho/forget_password.dart';
 import 'package:folisho/rent_detail.dart';
@@ -11,12 +12,12 @@ import 'package:folisho/theme.dart';
 
 import 'confirmation.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginSalePage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginSalePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -258,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
             .then((uid) => {
                   Fluttertoast.showToast(msg: 'LOGIN SUCCESFULLY'),
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => RegistrationPage())),
+                      builder: (context) => SaleRegistrationPage())),
                 });
       } on FirebaseAuthException catch (error) {
         switch (error.code) {

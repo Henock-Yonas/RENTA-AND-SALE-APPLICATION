@@ -1,112 +1,195 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:folisho/SearchSale.dart';
+import 'package:folisho/SerachRent.dart';
+import 'package:folisho/model/rent_model.dart';
+import 'package:folisho/rent_detail.dart';
 import 'package:folisho/sale_detail.dart';
 import 'package:folisho/theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Sale extends StatelessWidget {
-  const Sale({Key? key}) : super(key: key);
+  Sale({Key? key, this.usermap}) : super(key: key);
+
+  QuerySnapshot<Map<String, dynamic>>? usermap;
+  Stream<QuerySnapshot> users =
+      FirebaseFirestore.instance.collection('sale').snapshots();
+  int? index;
+
+  bool isloading = true;
+  final TextEditingController _search = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: greyColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // NOTE: header
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 30.0,
-                  top: 30.0,
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    "assets/images/menu_icon.png",
-                    width: 18,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 100.0, top: 10.0),
-                child: Text(
-                  "የሚሸጥ ቤት",
-                  style: primaryTitle,
-                ),
-              ),
-              // NOTE: search
-              Container(
-                padding: EdgeInsets.all(30.0),
-                child: Material(
-                  elevation: 6,
-                  shadowColor: shadowColor,
-                  borderRadius: BorderRadius.circular(28),
-                  child: TextField(
-                    decoration: searchDecoration,
-                  ),
-                ),
-              ),
-              // NOTE: slider
-              Container(
-                height: 216,
-                child: ListView(
-                  padding: EdgeInsets.only(bottom: 10),
-                  scrollDirection: Axis.horizontal,
+    onsearch() {
+      FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+      _firestore
+          .collection('sale')
+          .where('address', isEqualTo: _search.text)
+          .get()
+          .then((value) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => SearchSale(value)));
+      });
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: users,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<QuerySnapshot> snapshot,
+        ) {
+          if (snapshot.hasError) {
+            return Scaffold(
+              backgroundColor: whiteColor,
+              body: Text('Connection lost',
+                  style: TextStyle(
+                    color: Colors.black,
+                  )),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              backgroundColor: whiteColor,
+              body: Text('loading',
+                  style: TextStyle(
+                    color: Colors.black,
+                  )),
+            );
+          }
+
+          final data = snapshot.requireData;
+          var x = data.size;
+
+          return Scaffold(
+            backgroundColor: greyColor,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(width: 30),
-                    SliderCard(
-                      imageUrl: "assets/images/banner1.png",
-                      title: "ዘመናዊ ፎቅ",
-                      city: "ታቦር ክ/ማ፣ ካምፕ ሰፈር",
-                      rating: 5,
+                    // NOTE: header
+                    Padding(
+                      padding: EdgeInsets.only(left: 100.0, top: 30.0),
+                      child: Text(
+                        "የሚሸጥ ቤት",
+                        style: primaryTitle,
+                      ),
                     ),
-                    SizedBox(width: 30),
-                    SliderCard(
-                      imageUrl: "assets/images/banner2.png",
-                      title: "ኤልሼፕ",
-                      city: "ፒያሳ",
-                      rating: 4,
+                    // NOTE: search
+                    Container(
+                      padding: EdgeInsets.all(30.0),
+                      child: Material(
+                        elevation: 6,
+                        shadowColor: shadowColor,
+                        borderRadius: BorderRadius.circular(28),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: whiteColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(28),
+                              borderSide: BorderSide.none,
+                            ),
+                            hintText: "Find your dream home",
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 19,
+                            ),
+                            suffixIcon: Padding(
+                              padding: EdgeInsets.all(8),
+                              child: MaterialButton(
+                                onPressed: () {
+                                  onsearch();
+                                },
+                                color: purpleColor,
+                                minWidth: 39,
+                                height: 39,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Icon(
+                                  Icons.search,
+                                  color: whiteColor,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          controller: _search,
+                        ),
+                      ),
+                    ),
+                    // NOTE: slider
+                    Container(
+                      height: 216,
+                      child: ListView.builder(
+                        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: data.size,
+                        itemBuilder: (context, index) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                  child: SliderCard(
+                                    //SizedBox(width: 30)
+                                    imageUrl: "${data.docs[index]['image']}",
+                                    title: "${data.docs[index]['kindofhome']}",
+                                    city: "${data.docs[index]['address']}",
+                                    id: index,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // NOTE: recommeded
+
+                    Padding(
+                      padding: EdgeInsets.only(left: 30, top: 30, bottom: 12),
+                      child: Text(
+                        "Recommended For You",
+                        style: secondaryTitle,
+                      ),
+                    ),
+
+                    RecommendCard(
+                      imageUrl: "${data.docs[data.size - 1]['image']}",
+                      title: "${data.docs[data.size - 1]['kindofhome']}",
+                      city: "${data.docs[data.size - 1]['address']}",
+                      id: 0,
+                    ),
+                    SizedBox(height: 16),
+                    RecommendCard(
+                      imageUrl: "${data.docs[data.size - 2]['image']}",
+                      title: "${data.docs[data.size - 2]['kindofhome']}",
+                      city: "${data.docs[data.size - 2]['address']}",
+                      id: 1,
+                    ),
+                    SizedBox(height: 16),
+                    RecommendCard(
+                      imageUrl: "${data.docs[data.size - 2]['image']}",
+                      title: "${data.docs[data.size - 2]['kindofhome']}",
+                      city: "${data.docs[data.size - 2]['address']}",
+                      id: 2,
+                    ),
+                    SizedBox(
+                      height: 60,
                     ),
                   ],
                 ),
               ),
-              // NOTE: recommeded
-              Padding(
-                padding: EdgeInsets.only(left: 30, top: 30, bottom: 12),
-                child: Text(
-                  "Recommended For You",
-                  style: secondaryTitle,
-                ),
-              ),
-              RecommendCard(
-                imageUrl: "assets/images/house1.png",
-                title: "የንግድ ቤት",
-                city: "ሰፈረ ሠላም",
-                rating: 4,
-              ),
-              SizedBox(height: 16),
-              RecommendCard(
-                imageUrl: "assets/images/house2.png",
-                title: "ባለ 1 መኝታ",
-                city: "01 ሞቢል",
-                rating: 5,
-              ),
-              SizedBox(height: 16),
-              RecommendCard(
-                imageUrl: "assets/images/house3.png",
-                title: "ሙሉ ጊቢ ለድርጅት",
-                city: "አቶቴ",
-                rating: 3,
-              ),
-              SizedBox(
-                height: 60,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 }
 
@@ -115,38 +198,40 @@ class SliderCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String city;
-  final int rating;
-
+  int id;
   SliderCard({
     required this.imageUrl,
     required this.title,
     required this.city,
-    required this.rating,
+    required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => SaleDetailPage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => SaleDetailPage(id)));
       },
       child: Material(
         shadowColor: shadowColor,
-        elevation: 5,
+        elevation: 20,
         borderRadius: BorderRadius.circular(14),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: Container(
-            height: 209,
-            width: 231,
+            height: 200,
+            width: 200,
             color: whiteColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  imageUrl,
+                FadeInImage(
+                  placeholder: AssetImage('assets/houseforsale.png'),
+                  image: NetworkImage(imageUrl),
                   width: 231,
                   height: 150,
+                  fit: BoxFit.fill,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -169,15 +254,6 @@ class SliderCard extends StatelessWidget {
                         ],
                       ),
                       Spacer(),
-                      Row(
-                        children: [1, 2, 3, 4, 5].map((e) {
-                          return Icon(
-                            Icons.star,
-                            color: (e <= rating) ? orangeColor : greyColor,
-                            size: 12,
-                          );
-                        }).toList(),
-                      ),
                     ],
                   ),
                 ),
@@ -195,14 +271,13 @@ class RecommendCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String city;
-  final int rating;
+  int id;
 
-  RecommendCard({
-    required this.imageUrl,
-    required this.title,
-    required this.city,
-    required this.rating,
-  });
+  RecommendCard(
+      {required this.imageUrl,
+      required this.title,
+      required this.city,
+      required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -222,9 +297,11 @@ class RecommendCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Image.asset(
-                imageUrl,
+              FadeInImage(
+                placeholder: AssetImage('assets/houseforsale.png'),
+                image: NetworkImage(imageUrl),
                 width: 60,
+                fit: BoxFit.fill,
               ),
               SizedBox(width: 8),
               Column(
@@ -244,21 +321,13 @@ class RecommendCard extends StatelessWidget {
                   SizedBox(
                     height: 8,
                   ),
-                  Row(
-                    children: [1, 2, 3, 4, 5].map((e) {
-                      return Icon(
-                        Icons.star,
-                        size: 12,
-                        color: (e <= rating) ? orangeColor : greyColor,
-                      );
-                    }).toList(),
-                  )
                 ],
               ),
               Spacer(),
               IconButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => SaleDetailPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => SaleDetailPage(id)));
                 },
                 icon: Icon(
                   Icons.arrow_forward_ios,
@@ -273,5 +342,3 @@ class RecommendCard extends StatelessWidget {
     );
   }
 }
-
-
